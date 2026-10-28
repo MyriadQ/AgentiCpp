@@ -1,0 +1,13 @@
+build/
+.cache/
+compile_commands.json
+data/logs/
+data/*.bin
+data/*.bin.tmp
+data/audit.log
+data/STOP
+run/
+*.core
+*.swp
+labs/
+docs/

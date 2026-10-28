@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "_comment": "PLAN.md \u00a76.7. `mode` is the kill switch: dry_run never calls execve.",
+  "mode": "dry_run",
+  "require_confirmation": true,
+  "log_source": {
+    "path": "data/logs/victim.log",
+    "poll_interval_ms": 200,
+    "from_start": false,
+    "max_line_bytes": 65536
+  },
+  "memory": {
+    "path": "data/memory.bin",
+    "dim": 512,
+    "top_k": 3,
+    "recall_threshold": 0.86
+  },
+  "llm": {
+    "base_url": "https://api.deepseek.com/chat/completions",
+    "model": "deepseek-flash",
+    "api_key_env": "DEEPSEEK_API_KEY",
+    "temperature": 0.0,
+    "thinking": false,
+    "reasoning_effort": "low",
+    "max_tokens": 256,
+    "max_tokens_thinking": 2048,
+    "timeout_ms": 15000,
+    "connect_timeout_ms": 3000,
+    "max_retries": 3,
+    "warmup": true,
+    "warmup_timeout_ms": 30000
+  },
+  "guards": {
+    "max_tool_calls_per_incident": 4,
+    "max_llm_round_trips": 3,
+    "max_llm_wall_ms": 10000,
+    "max_llm_wall_ms_escalated": 25000,
+    "incident_dedup_window_s": 60,
+    "cooldown_initial_s": 60,
+    "cooldown_max_s": 1800,
+    "max_concurrent_incidents": 2
+  },
+  "executor": {
+    "timeout_ms": 30000,
+    "grace_ms": 200,
+    "output_cap_bytes": 65536,
+    "env_allowlist": [
+      "PATH",
+      "HOME",
+      "LANG",
+      "LC_ALL"
+    ],
+    "rlimits": {
+      "cpu_seconds": 10,
+      "address_space_bytes": 536870912,
+      "nproc": 64,
+      "fsize_bytes": 1048576
+    }
+  },
+  "verifier": {
+    "health_url": "http://127.0.0.1:8080/health",
+    "health_timeout_ms": 5000,
+    "log_quiet_window_ms": 3000
+  },
+  "allow": [
+    {
+      "id": "restart-victim",
+      "program": "scripts/restart-victim.sh",
+      "max_args": 0,
+      "doc": "Restart the demo victim service. Use when the service is not answering or has crashed."
+    },
+    {
+      "id": "kill-decoy",
+      "program": "scripts/kill-decoy.sh",
+      "max_args": 0,
+      "doc": "Stop the process that is occupying the victim's port. Use when the log says 'address already in use'."
+    },
+    {
+      "id": "fix-config",
+      "program": "scripts/fix-config.sh",
+      "max_args": 0,
+      "doc": "Repair the victim config and restart. Use when the log says 'parse config: unexpected token'."
+    }
+  ],
+  "deny_programs": [
+    "sh",
+    "bash",
+    "dash",
+    "zsh",
+    "rm",
+    "dd",
+    "mkfs",
+    "sudo",
+    "su",
+    "curl",
+    "wget",
+    "chmod",
+    "chown",
+    "kill",
+    "pkill",
+    "mount",
+    "nc"
+  ]
+}

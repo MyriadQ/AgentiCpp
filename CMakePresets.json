@@ -1,0 +1,132 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "BUILD_TESTING": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "clang-19 + ASan/UBSan (daily driver)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_COMPILER": "clang++-19",
+        "AGENTICPP_SANITIZE": "ON",
+        "AGENTICPP_ENABLE_LLM": "OFF"
+      }
+    },
+    {
+      "name": "debug-llm",
+      "displayName": "clang-19 + ASan/UBSan + LLM deps (week 2)",
+      "inherits": "debug",
+      "cacheVariables": {
+        "AGENTICPP_ENABLE_LLM": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "clang-19 optimized",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_CXX_COMPILER": "clang++-19",
+        "AGENTICPP_NATIVE": "OFF",
+        "AGENTICPP_ENABLE_LLM": "ON"
+      },
+      "description": "Portable baseline; the AVX2 translation unit opts in per-source with -mavx2 -mfma."
+    },
+    {
+      "name": "tsan",
+      "displayName": "clang-19 + ThreadSanitizer (concurrency tests)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_CXX_COMPILER": "clang++-19",
+        "AGENTICPP_TSAN": "ON",
+        "AGENTICPP_ENABLE_LLM": "OFF"
+      }
+    },
+    {
+      "name": "gcc-debug",
+      "displayName": "g++-14 second opinion",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_COMPILER": "g++-14",
+        "AGENTICPP_SANITIZE": "ON",
+        "AGENTICPP_ENABLE_LLM": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "debug-llm",
+      "configurePreset": "debug-llm"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "tsan",
+      "configurePreset": "tsan"
+    },
+    {
+      "name": "gcc-debug",
+      "configurePreset": "gcc-debug"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "debug-llm",
+      "configurePreset": "debug-llm",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "tsan",
+      "configurePreset": "tsan",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "gcc-debug",
+      "configurePreset": "gcc-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

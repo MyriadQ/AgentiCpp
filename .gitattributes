@@ -1,0 +1,5 @@
+# Force LF everywhere. CRLF will silently corrupt the log parser and every
+# golden-file test. See PLAN.md §1.
+* text=auto eol=lf
+*.png binary
+*.bin binary
